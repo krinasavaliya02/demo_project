@@ -269,7 +269,7 @@ class CompanyListView(LoginRequiredMixin, View):
             if order_field:
                 companies = companies.order_by(order_field)
             else:
-                companies = companies.order_by('id')
+                companies = companies.order_by('name')
                                     
             if search:
                 companies = companies.filter(
