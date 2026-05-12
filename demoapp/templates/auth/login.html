@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %} Login Page {% endblock %}
+
+{% block style %}
+    #message{
+      position: fixed;
+      top: 20px;
+      right: 12px;
+      width: 300px;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center align-items-center vh-100">
+    <div class="col-sm-4 bg-light p-4 rounded-3 shadow">
+
+      <form method="post" id="login_form">
+        {% csrf_token %}
+        <h3 class="text-center mb-4">Login</h3>
+
+        <div id="message"></div>
+
+        <input type="hidden" id="next" name="next" value="{{ request.GET.next }}">
+
+        <div class="mb-3">
+          <label class="form-label">Username:</label>
+          <input type="text" id='username' name="username" class="form-control" placeholder="Enter username or email">
+          <p class="error"></p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Password:</label>
+          <input type="password" id='password' name="password" class="form-control" placeholder="Enter password">
+          <p class="error"></p>
+        </div>
+
+        <button type="submit" id='login_btn' class="btn btn-primary w-100">Login</button>
+        
+        <p class="text-center mt-3 mb-0">
+          Don't have an account? <a href="{% url 'register' %}" class="text-decoration-none">Register here.</a>
+        </p>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+<div class="project-block border border-2 rounded p-3 shadow-sm mb-3">
+    <div class="text-end">
+        <button type="button" class="btn btn-outline-danger btn-sm remove-project-btn"><i class="fa-regular fa-trash-can"></i> Delete</button>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-sm-3">
+        <label>Project Name:</label>
+        </div>
+        <div class="col-sm-9">
+        <input type="text" name="project_name" value="{{ project.name }}" class="project_name form-control" placeholder="Enter project name" />
+        <p class="error"></p>
+        </div>
+    </div>
+
+    <div class="row mt-1">
+        <div class="col-sm-3">
+        <label>Technology:</label>
+        </div>
+        <div class="col-sm-9">
+        <input type="text" name="technology" value="{{ project.technology }}" class="technology form-control" placeholder="Enter technology" />
+        <p class="error"></p>
+        </div>
+    </div>
+
+    <div class="row mt-1">
+        <div class="col-sm-3">
+        <label>Status:</label>
+        </div>
+        <div class="col-sm-9">
+        <select name="status" class="status form-select">
+            <option value="">Select Option</option>
+            <option value="PENDING" {% if project.status == 'PENDING' %}selected{% endif %}>Pending</option>
+            <option value="ONGOING" {% if project.status == 'ONGOING' %}selected{% endif %}>Ongoing</option>
+            <option value="COMPLETED" {% if project.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+            <option value="CLOSED" {% if project.status == 'CLOSED' %}selected{% endif %}>Closed</option>
+            <option value="CANCELLED" {% if project.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+        </select>
+        <p class="error"></p>
+        </div>
+    </div>
+</div>

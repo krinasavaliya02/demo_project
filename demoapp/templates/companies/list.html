@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %} List Page {% endblock %}
+
+{% block content %}
+
+  <div class="container mt-5 d-flex justify-content-center">
+    <div class="col-sm-11 text-start">
+      <h2>Company Details (<span id="totalCompanies">0</span>)</h2>
+
+      <div class="row align-items-center mt-5">
+        <div class="col-4">
+            <input type="text" id="searchBox" class="form-control" placeholder="Search company name or email or phone number" />
+        </div>
+
+        <div class="col-6 d-flex justify-content-center gap-3">
+
+          <select id="statusDropdown" class="status form-select">
+            <option value="">All Status</option>
+            <option value="active" >Active</option>
+            <option value="inactive">Inactive</option>
+          </select> 
+
+          <select id="projectDropdown" class="form-select">
+            <option value="">All Projects</option>
+            {% for project in projects %}
+              <option value="{{project}}">{{project}}</option>
+            {% endfor %}
+          </select>
+
+          <select id="technologyDropdown" class="form-select">
+            <option value="">All Technology</option>
+             {% for tech in technologies %}
+              <option value="{{tech}}">{{tech}}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-2 text-end">
+            <a href="{% url 'companies:new' %}" class="btn btn-success btn-sm">
+              <i class="fa-solid fa-plus"></i> Add Company
+            </a>      
+        </div>
+      </div>
+      
+      <div id="table_container">
+        {% include 'companies/get_list.html' %}
+      </div>
+
+    </div>
+  </div>
+{% endblock %}
+
