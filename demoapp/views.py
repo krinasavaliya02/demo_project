@@ -51,6 +51,7 @@ class LoginView(View):
         return render(request, 'auth/login.html')
 
     def post(self, request):
+        
         username = request.POST.get('username')
         password = request.POST.get('password')
 
@@ -268,7 +269,7 @@ class CompanyListView(LoginRequiredMixin, View):
             if order_field:
                 companies = companies.order_by(order_field)
             else:
-                companies = companies.order_by('name')
+                companies = companies.order_by('id')
                                     
             if search:
                 companies = companies.filter(
