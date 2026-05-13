@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
-from django.core.paginator import Paginator
 from demoapp.utils import name_exists, email_exists, sendResponse
 
 class RegisterView(View):
