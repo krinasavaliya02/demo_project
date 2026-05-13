@@ -3,7 +3,6 @@ from demoapp.models import Company, Project
 from django.http import JsonResponse, QueryDict
 from django.db.models import Q
 import json
-from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
