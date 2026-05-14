@@ -106,7 +106,7 @@ $(document).ready(function () {
         let method = '';
 
         if (company_id) {
-            url = `/companies/${company_id}/edit`;
+            url = `/companies/${company_id}/edit/`;
             method = "PUT";
         }
         else {

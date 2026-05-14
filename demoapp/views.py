@@ -82,7 +82,7 @@ class DashboardView(LoginRequiredMixin,View):
     login_url = '/login/'
     def get(self, request):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            total = Company.objects.count()
+            total = Company.objects.filter(user=request.user).count()
             return sendResponse(200,"success", {'total': total})
         return render(request, 'companies/dashboard.html')
 
@@ -104,10 +104,10 @@ class AddView(LoginRequiredMixin,View):
             "project":[]
         }
 
-        if name_exists(company_name):
+        if name_exists(company_name, request.user):
             errors["company"].append({"field": "company_name", "message": "Company name already exists"})
             
-        if email_exists(email):
+        if email_exists(email, request.user):
             errors["company"].append({"field": "email", "message": "Company email already exists"})
 
         project_name = []
@@ -136,6 +136,7 @@ class AddView(LoginRequiredMixin,View):
             return sendResponse(400, "Errors", errors)
             
         company = Company.objects.create(
+            user=request.user,
             name = company_name,
             email= email,
             phone = phone,
@@ -155,13 +156,13 @@ class EditView(LoginRequiredMixin, View):
     login_url = '/login/'
     def get(self, request, id):
         try:
-            company = Company.objects.prefetch_related('projects').get(id=id)
+            company = Company.objects.prefetch_related('projects').get(id=id, user=request.user)
         except Company.DoesNotExist:
             company = None
         return render(request, 'companies/edit.html',{'company':company})
     
     def put(self, request, id):
-        company = Company.objects.prefetch_related('projects').get(id=id)
+        company = Company.objects.prefetch_related('projects').get(id=id, user=request.user)
         data = QueryDict(request.body)
         company_name=data.get('name')   
         email=data.get('email')
@@ -175,10 +176,10 @@ class EditView(LoginRequiredMixin, View):
             "company":[],
             "project":[]
         }
-        if Company.objects.filter(name__iexact=company_name).exclude(id=id).exists():
+        if Company.objects.filter(name__iexact=company_name,user=request.user).exclude(id=id).exists():
             errors["company"].append({"field": "company_name", "message": "Company name already exists"})
         
-        if Company.objects.filter(email__iexact=email).exclude(id=id).exists():
+        if Company.objects.filter(email__iexact=email,user=request.user).exclude(id=id).exists():
             errors["company"].append({"field": "email", "message": "Company email already exists"})
 
         project_name = []
@@ -262,7 +263,7 @@ class CompanyListView(LoginRequiredMixin, View):
             project = request.GET.get('project')
             technology = request.GET.get('technology')
 
-            companies = Company.objects.prefetch_related('projects').all()
+            companies = Company.objects.prefetch_related('projects').filter(user=request.user)
 
             if order_field:
                 companies = companies.order_by(order_field)
@@ -310,6 +311,6 @@ class CompanyListView(LoginRequiredMixin, View):
                 "data" : data
             }
             return JsonResponse(response)
-        projects = Project.objects.values_list('name', flat=True).distinct()
-        technologies = Project.objects.values_list('technology', flat=True).distinct()
+        projects = Project.objects.filter(company__user=request.user).values_list('name', flat=True).distinct()
+        technologies = Project.objects.filter(company__user=request.user).values_list('technology', flat=True).distinct()
         return render(request, 'companies/list.html', {'projects': projects, 'technologies': technologies})
