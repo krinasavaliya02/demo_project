@@ -230,7 +230,7 @@ $(document).ready(function () {
     }
 
 
-    $('#searchBox, #statusDropdown, #projectDropdown, #technologyDropdown').on('keyup change', function () {
+    $('#searchBox, #statusDropdown, #projectDropdown, #technologyDropdown, #userDropdown').on('keyup change', function () {
         table.ajax.reload();
     });
 
@@ -253,6 +253,7 @@ $(document).ready(function () {
                 d.status = $('#statusDropdown').val()
                 d.project = $('#projectDropdown').val()
                 d.technology = $('#technologyDropdown').val()
+                d.user = $('#userDropdown').val()
             }
         },
         "columns": [

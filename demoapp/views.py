@@ -3,11 +3,12 @@ from demoapp.models import Company, Project
 from django.http import JsonResponse, QueryDict
 from django.db.models import Q
 import json
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from demoapp.utils import name_exists, email_exists, sendResponse
+User = get_user_model()
 
 class RegisterView(View):
 
@@ -82,7 +83,10 @@ class DashboardView(LoginRequiredMixin,View):
     login_url = '/login/'
     def get(self, request):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            total = Company.objects.filter(user=request.user).count()
+            if request.user.role == 'ADMIN':
+                total = Company.objects.count()
+            else:
+                total = Company.objects.filter(user=request.user).count()
             return sendResponse(200,"success", {'total': total})
         return render(request, 'companies/dashboard.html')
 
@@ -156,7 +160,10 @@ class EditView(LoginRequiredMixin, View):
     login_url = '/login/'
     def get(self, request, id):
         try:
-            company = Company.objects.prefetch_related('projects').get(id=id, user=request.user)
+            if request.user.role == 'ADMIN':
+                company = Company.objects.prefetch_related('projects').get(id=id)
+            else:
+                company = Company.objects.prefetch_related('projects').get(id=id, user=request.user)
         except Company.DoesNotExist:
             company = None
         return render(request, 'companies/edit.html',{'company':company})
@@ -262,8 +269,12 @@ class CompanyListView(LoginRequiredMixin, View):
             status = request.GET.get('status')
             project = request.GET.get('project')
             technology = request.GET.get('technology')
+            selected_user = request.GET.get('user')
 
-            companies = Company.objects.prefetch_related('projects').filter(user=request.user)
+            if request.user.role == 'ADMIN':
+                companies = Company.objects.prefetch_related('projects').all()
+            else:
+                companies = Company.objects.prefetch_related('projects').filter(user=request.user)
 
             if order_field:
                 companies = companies.order_by(order_field)
@@ -284,6 +295,9 @@ class CompanyListView(LoginRequiredMixin, View):
 
             if technology:
                 companies = companies.filter(projects__technology__icontains=technology)
+
+            if selected_user:
+                companies = companies.filter(user_id=selected_user)
                 
             total = companies.count()
             companies = companies[start:start+length]
@@ -311,6 +325,72 @@ class CompanyListView(LoginRequiredMixin, View):
                 "data" : data
             }
             return JsonResponse(response)
-        projects = Project.objects.filter(company__user=request.user).values_list('name', flat=True).distinct()
-        technologies = Project.objects.filter(company__user=request.user).values_list('technology', flat=True).distinct()
-        return render(request, 'companies/list.html', {'projects': projects, 'technologies': technologies})
+
+        users = User.objects.filter(role='STAFF')
+            
+        if request.user.role == 'ADMIN':
+            projects = Project.objects.values_list('name', flat=True).distinct()
+            technologies = Project.objects.values_list('technology', flat=True).distinct()    
+        else:
+            projects = Project.objects.filter(company__user=request.user).values_list('name', flat=True).distinct()
+            technologies = Project.objects.filter(company__user=request.user).values_list('technology', flat=True).distinct()
+        return render(request, 'companies/list.html', {'projects': projects, 'technologies': technologies, 'users': users})
+
+class EditProfileView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            user = User.objects.get(id=request.user.id)
+            return render(request, 'companies/edit_profile.html', {'user': user})
+
+    def put(self, request):
+        user = User.objects.get(id=request.user.id)
+        data = QueryDict(request.body)
+        username = data.get('username')
+        email = data.get('email')
+
+        errors = []
+
+        if User.objects.filter(username__iexact=username).exclude(id=user.id).exists():
+            errors.append({"field" : "username", "message" :"Username already exists"})
+        
+        if User.objects.filter(email__iexact=email).exclude(id=user.id).exists():
+            errors.append({"field" : "email", "message" :"Email already exists"})
+
+        if errors:
+            return sendResponse(400, "Errors", errors)
+
+        user.username = username
+        user.email = email
+        user.save()
+
+        return sendResponse(200, "Profile updated successfully!!!" )
+
+class ChangePasswordView(View):
+    def get(self, request):
+        return render(request, 'companies/change_password.html')
+
+    def post(self, request):
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        user = User.objects.get(id=request.user.id)
+
+        errors = []
+
+        if not user.check_password(current_password):
+            errors.append({"field" : "current_password", "message" :"Current password is incorrect"})
+        
+        if len(new_password) < 8:
+            errors.append({"field" : "new_password", "message" :"Password must be at least 8 characters long"})
+
+        if new_password != confirm_password:
+            errors.append({"field" : "confirm_password", "message" :"Password do not match"})
+
+        if errors:
+            return sendResponse(400, "Errors", errors)
+
+        user.set_password(new_password)
+        user.save()
+
+        return sendResponse(200, "Password changed successfully!!!" )

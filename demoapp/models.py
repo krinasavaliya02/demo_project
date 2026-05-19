@@ -1,12 +1,27 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 
-User = get_user_model()
+class User(AbstractUser):
 
+    ROLE_CHOICES = (
+        ('ADMIN', 'Admin'),
+        ('STAFF', 'Staff'),
+    )
+
+    role = models.CharField(
+        max_length=10,
+        choices=ROLE_CHOICES,
+        default='STAFF'
+    )
+
+    def __str__(self):
+        return self.username
+        
 class Company(models.Model):
 
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="companies"
     )

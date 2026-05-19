@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'demoapp',
 ]
 
+AUTH_USER_MODEL = 'demoapp.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -76,7 +78,7 @@ WSGI_APPLICATION = 'demoproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'demo1',
+        'NAME': 'demo_db',
         'USER' : 'postgres',
         'PASSWORD' : 'root',
         'HOST': 'localhost',

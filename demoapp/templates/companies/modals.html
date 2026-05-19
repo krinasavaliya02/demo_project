@@ -1,0 +1,105 @@
+
+<style>
+    #message{
+        position: fixed;
+        top: 20px;
+        right: 12px;
+        width: 300px;
+        z-index: 9999;
+    }
+</style>
+
+<!-- Edit Profile -->
+
+<div id="message"></div>
+<div class="modal fade" id="editProfileModel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="" id="edit_profile_form">
+                {% csrf_token %}
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Profile <i class="fa-solid fa-circle-user ms-2"></i></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    
+                    <input type="hidden" id="next" name="next" value="{{ request.GET.next }}">
+
+                    <div class="mb-3">
+                    <label class="form-label"><b>Username:</b></label>
+                    <input type="text" id='username' name="username" value="{{ request.user.username }}" class="form-control" placeholder="Enter username">
+                    <p class="error"></p>
+                    </div>
+
+                    <div class="mb-3">
+                    <label class="form-label"><b>Email:</b></label>
+                    <input type="email" id='email' name="email" value="{{ request.user.email }}" class="form-control" placeholder="Enter email">
+                    <p class="error"></p>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Change Password -->
+
+<div class="modal fade" id="passwordModel" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form id="update_password">
+                {% csrf_token %}
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title"> Change Password <i class="fa-solid fa-key ms-2"></i> </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                    <label class="form-label"><b>Current Password:</b></label>
+                    <input type="password" id='current_password' name="current_password" class="form-control" placeholder="Enter current password">
+                    <p class="error"></p>
+                    </div>
+
+                    <div class="mb-3">
+                    <label class="form-label"><b>New Password:</b></label>
+                    <input type="password" id='new_password' name="new_password" class="form-control" placeholder="Enter new password">
+                    <p class="error"></p>
+                    </div>
+
+                    <div class="mb-3">
+                    <label class="form-label"><b>Confirm Password:</b></label>
+                    <input type="password" id='confirm_password' name="confirm_password" class="form-control" placeholder="Enter confirm password">
+                    <p class="error"></p>
+                    </div>
+
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Update Password</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
